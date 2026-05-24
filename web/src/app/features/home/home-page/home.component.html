@@ -1,0 +1,25 @@
+<main class="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-8">
+  <h1 class="text-4xl font-bold mb-2 tracking-tight">Bake Games!</h1>
+  <p class="text-gray-400 mb-12 text-lg">Escolha um jogo e convide um horrivel.</p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl">
+    @for (game of games; track game.id) {
+      <button
+        (click)="onSelectGame(game)"
+        class="group bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-gray-600 rounded-2xl p-6 text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <h2 class="text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">
+          {{ game.title }}
+        </h2>
+        <p class="text-gray-400 text-sm mb-4">{{ game.description }}</p>
+        <span class="text-xs text-gray-500 border border-gray-700 rounded-full px-3 py-1">
+          {{ game.players }}
+        </span>
+      </button>
+    }
+  </div>
+</main>
+
+@if (selectedGame()) {
+  <app-game-entry [game]="selectedGame()!" (close)="onCloseEntry()" />
+}

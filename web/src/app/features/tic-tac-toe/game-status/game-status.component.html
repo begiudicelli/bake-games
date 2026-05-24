@@ -1,0 +1,19 @@
+<div class="text-center py-2 min-h-12 flex items-center justify-center">
+  @if (phase() === 'waiting') {
+    <p class="text-gray-400 animate-pulse">Aguardando outro jogador entrar...</p>
+  } @else if (phase() === 'finished') {
+    @if (winner() === 'draw') {
+      <p class="text-yellow-400 text-lg font-semibold">Empate!</p>
+    } @else {
+      <p class="text-green-400 text-lg font-semibold">{{ getPlayerName(winner()!) }} venceu! 🎉</p>
+    }
+  } @else {
+    @if (isMyTurn()) {
+      <p class="text-blue-400 font-medium">Sua vez!</p>
+    } @else {
+      <p class="text-gray-400">
+        Vez de <span class="text-white font-medium">{{ getPlayerName(currentTurn()) }}</span>
+      </p>
+    }
+  }
+</div>

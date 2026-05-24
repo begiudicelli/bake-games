@@ -1,0 +1,30 @@
+<div class="min-h-screen bg-gray-950 text-white flex items-center justify-center p-4">
+  <div class="w-full max-w-md rounded-2xl bg-gray-900 p-6 space-y-6">
+    <div class="space-y-2">
+      <h1 class="text-2xl font-bold">Entrando em {{ roomId }}</h1>
+
+      <p class="text-gray-400">Como você quer ser chamado(a) nessa partida?</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="join()" class="space-y-4">
+      <div class="space-y-2">
+        <input
+          type="text"
+          formControlName="playerName"
+          maxlength="20"
+          placeholder="Seu apelido"
+          class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 outline-none focus:border-blue-500"
+        />
+
+        <p class="text-sm text-gray-500">Máx. 20 caracteres.</p>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full rounded-lg bg-blue-600 py-3 font-medium hover:bg-blue-500"
+      >
+        Entrar na partida
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,85 @@
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="'Criar sala para ' + game().title"
+  (click)="onClose()"
+>
+  <div
+    class="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-md shadow-xl"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold text-white">{{ game().title }}</h2>
+      <button
+        (click)="onClose()"
+        class="text-gray-500 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded p-1"
+        aria-label="Fechar"
+      >
+        ✕
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="flex flex-col gap-5">
+        <div class="flex flex-col gap-1">
+          <label for="playerName" class="text-sm text-gray-400">Seu nome</label>
+          <input
+            id="playerName"
+            type="text"
+            formControlName="playerName"
+            placeholder="Como você quer ser chamado?"
+            class="bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+          />
+          @if (form.controls.playerName.invalid && form.controls.playerName.touched) {
+            <span class="text-xs text-rose-400">Mínimo 2 caracteres.</span>
+          }
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label for="roomName" class="text-sm text-gray-400">Nome da sala</label>
+          <input
+            id="roomName"
+            type="text"
+            formControlName="roomName"
+            placeholder="Ex: sala-do-brian"
+            class="bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+          />
+          @if (form.controls.roomName.invalid && form.controls.roomName.touched) {
+            <span class="text-xs text-rose-400">Mínimo 2 caracteres.</span>
+          }
+        </div>
+
+        @if (game().hasDifficulty) {
+          <div class="flex flex-col gap-2">
+            <span class="text-sm text-gray-400">Dificuldade</span>
+            <div class="grid grid-cols-3 gap-2">
+              @for (option of ['easy', 'medium', 'hard']; track option) {
+                <button
+                  type="button"
+                  (click)="form.controls.difficulty.setValue(option)"
+                  class="py-2 rounded-xl border text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class]="
+                    form.controls.difficulty.value === option
+                      ? 'bg-blue-600 border-blue-500 text-white'
+                      : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-500'
+                  "
+                >
+                  {{ option === 'easy' ? 'Fácil' : option === 'medium' ? 'Médio' : 'Difícil' }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <button
+          type="submit"
+          [disabled]="form.invalid || loading()"
+          class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed font-semibold text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 mt-2"
+        >
+          {{ loading() ? 'Criando...' : 'Criar sala' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

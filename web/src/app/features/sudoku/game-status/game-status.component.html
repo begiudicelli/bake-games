@@ -1,0 +1,22 @@
+<div class="flex flex-col items-center gap-2 py-2 min-h-12 justify-center">
+  @if (phase() === 'waiting') {
+    <p class="text-gray-400 animate-pulse">Aguardando outro jogador...</p>
+  } @else if (phase() === 'finished') {
+    @for (player of players(); track player.id) {
+      @if (player.winner) {
+        <p class="text-green-400 text-lg font-semibold">
+          {{ player.isMe ? 'Você venceu! 🎉' : player.name + ' venceu!' }}
+        </p>
+      }
+    }
+    @for (player of players(); track player.id) {
+      @if (player.finished && !player.winner && player.hasErrors) {
+        <p class="text-sm" [class]="player.isMe ? 'text-rose-400' : 'text-gray-400'">
+          {{ player.isMe ? 'Sua solução tem erros.' : player.name + ' terminou com erros.' }}
+        </p>
+      }
+    }
+  } @else {
+    <p class="text-gray-400 text-sm">Resolva o tabuleiro e clique em enviar!</p>
+  }
+</div>

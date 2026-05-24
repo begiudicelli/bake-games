@@ -1,0 +1,120 @@
+<main
+  class="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-6 gap-6"
+>
+  <div class="w-full max-w-5xl flex items-center justify-between">
+    <button
+      (click)="goHome()"
+      class="text-gray-400 hover:text-white text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+      aria-label="Voltar para a tela inicial"
+    >
+      ← Voltar
+    </button>
+    <h1 class="text-lg font-semibold">Sudoku</h1>
+    <div class="w-16"></div>
+  </div>
+
+  <div class="w-full max-w-5xl">
+    <app-room-info [roomId]="roomId" gameRoute="sudoku" />
+  </div>
+
+  <app-sudoku-game-status
+    [phase]="gameService.state().phase"
+    [players]="gameService.playersInfo()"
+  />
+
+  @if (gameService.state().phase === 'waiting') {
+    <p class="text-gray-600 text-sm">O tabuleiro aparecerá quando os dois jogadores entrarem.</p>
+  } @else {
+    <div class="flex gap-12 items-start">
+      <div class="flex flex-col items-center gap-4">
+        <div class="flex items-center gap-3">
+          <span class="text-white font-medium">{{ gameService.myState()?.name ?? 'Você' }}</span>
+          <span class="text-xs text-blue-400 border border-blue-800 rounded-full px-2 py-0.5"
+            >você</span
+          >
+          <span class="text-sm text-gray-400">
+            {{ gameService.myState()?.progress ?? 0 }}/{{ totalEmpty() }} células
+          </span>
+        </div>
+
+        <app-sudoku-board
+          [puzzle]="gameService.state().puzzle"
+          [grid]="gameService.myState()?.grid ?? emptyGrid"
+          [disabled]="
+            gameService.state().phase !== 'playing' || (gameService.myState()?.finished ?? false)
+          "
+          (placeNumber)="gameService.placeNumber($event.row, $event.col, $event.value)"
+          (erase)="gameService.erase($event.row, $event.col)"
+        />
+
+        @if (
+          gameService.state().phase === 'playing' && !(gameService.myState()?.finished ?? false)
+        ) {
+          <button
+            (click)="gameService.submit()"
+            class="px-8 py-3 rounded-xl bg-green-600 hover:bg-green-500 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-green-400"
+          >
+            Enviar solução
+          </button>
+        }
+
+        @if (gameService.myState()?.finished && gameService.myState()?.hasErrors) {
+          <p class="text-rose-400 text-sm text-center max-w-xs">
+            Sua solução tem erros. Encontre e corrija para continuar.
+          </p>
+        }
+
+        @if (gameService.error()) {
+          <p class="text-rose-400 text-sm">{{ gameService.error() }}</p>
+        }
+      </div>
+
+      <div class="w-px bg-gray-800 self-stretch"></div>
+
+      <div class="flex flex-col items-center gap-4">
+        @if (gameService.opponentState()) {
+          <div class="flex items-center gap-3">
+            <span class="text-white font-medium">{{ gameService.opponentState()!.name }}</span>
+            <span class="text-sm text-gray-400">
+              {{ gameService.opponentState()!.progress }}/{{ totalEmpty() }} células
+            </span>
+          </div>
+
+          <div class="w-[432px] h-[432px] relative">
+            <app-sudoku-board
+              [puzzle]="gameService.state().puzzle"
+              [grid]="emptyGrid"
+              [disabled]="true"
+            />
+            <div
+              class="absolute inset-0 bg-gray-950/90 rounded-lg flex flex-col items-center justify-center gap-3"
+            >
+              <span class="text-5xl font-bold text-white">
+                {{ gameService.opponentState()!.progress }}
+              </span>
+              <span class="text-gray-400 text-sm"> de {{ totalEmpty() }} células preenchidas </span>
+              <div class="w-48 h-2 bg-gray-800 rounded-full overflow-hidden mt-2">
+                <div
+                  class="h-full bg-blue-500 rounded-full transition-all duration-500"
+                  [style.width.%]="(gameService.opponentState()!.progress / totalEmpty()) * 100"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          @if (gameService.opponentState()!.finished && gameService.opponentState()!.hasErrors) {
+            <p class="text-rose-400 text-sm">
+              {{ gameService.opponentState()!.name }} terminou com erros.
+            </p>
+          }
+        } @else {
+          <div
+            class="w-[432px] h-[432px] flex items-center justify-center border-2 border-dashed border-gray-800 rounded-lg"
+          >
+            <p class="text-gray-600 text-sm">Aguardando adversário...</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</main>

@@ -1,0 +1,36 @@
+<div
+  class="inline-grid grid-cols-9 border-2 border-gray-500 rounded-lg overflow-hidden select-none"
+  role="grid"
+  aria-label="Tabuleiro de Sudoku"
+>
+  @for (row of rows; track row) {
+    @for (col of cols; track col) {
+      <button
+        role="gridcell"
+        [attr.aria-label]="'Linha ' + (row + 1) + ' coluna ' + (col + 1)"
+        [disabled]="disabled()"
+        (click)="selectCell(row, col)"
+        class="w-12 h-12 flex items-center justify-center text-lg transition-colors duration-100 focus:outline-none relative
+          border-gray-700
+          {{ boxBorderRight(col) ? 'border-r-2 border-r-gray-500' : 'border-r border-r-gray-700' }}
+          {{ boxBorderBottom(row) ? 'border-b-2 border-b-gray-500' : 'border-b border-b-gray-700' }}
+          {{
+          isSelected(row, col)
+            ? 'bg-blue-600/30'
+            : isSameBox(row, col)
+              ? 'bg-gray-800/60'
+              : isSameRowOrCol(row, col)
+                ? 'bg-gray-800/40'
+                : 'bg-gray-900'
+        }}
+          {{ !disabled() && !isClue(row, col) ? 'cursor-pointer hover:bg-blue-600/20' : '' }}"
+      >
+        @if (cellValue(row, col) !== 0) {
+          <span class="font-medium" [class]="isClue(row, col) ? 'text-gray-300' : 'text-blue-400'">
+            {{ cellValue(row, col) }}
+          </span>
+        }
+      </button>
+    }
+  }
+</div>

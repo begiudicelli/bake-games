@@ -1,0 +1,22 @@
+<div role="grid" aria-label="Tabuleiro do jogo da velha" class="grid grid-cols-3 w-72 mx-auto">
+  @for (cell of board(); track $index) {
+    <button
+      role="gridcell"
+      [attr.aria-label]="'Célula ' + ($index + 1) + (cell ? ', ' + cell : ', vazia')"
+      [disabled]="!!cell || !isMyTurn() || phase() !== 'playing'"
+      (click)="cellClick.emit($index)"
+      class="h-24 w-24 flex items-center justify-center text-5xl font-bold transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 disabled:cursor-not-allowed
+        [&:nth-child(-n+6)]:border-b-2
+        [&:nth-child(3n+1)]:border-r-2
+        [&:nth-child(3n+2)]:border-r-2
+        border-gray-700
+        {{ !cell && isMyTurn() && phase() === 'playing' ? 'hover:bg-gray-800/50' : '' }}"
+    >
+      @if (cell === 'X') {
+        <span class="text-blue-400">X</span>
+      } @else if (cell === 'O') {
+        <span class="text-rose-400">O</span>
+      }
+    </button>
+  }
+</div>
