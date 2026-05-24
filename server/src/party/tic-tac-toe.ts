@@ -1,12 +1,6 @@
 import type * as Party from 'partykit/server';
-import type {
-  Board,
-  Cell,
-  ClientMessage,
-  Player,
-  RoomState,
-  ServerMessage,
-} from '@bake/shared';
+import type {TicTacToe} from '@bake/shared';
+
 
 const WINNING_COMBINATIONS = [
   [0, 1, 2],
@@ -19,19 +13,19 @@ const WINNING_COMBINATIONS = [
   [2, 4, 6],
 ];
 
-function checkWinner(board: Board): Player | 'draw' | null {
+function checkWinner(board: TicTacToe.Board): TicTacToe.Player | 'draw' | null {
   for (const [a, b, c] of WINNING_COMBINATIONS) {
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return board[a] as Player;
+      return board[a] as TicTacToe.Player;
     }
   }
   if (board.every((cell) => cell !== null)) return 'draw';
   return null;
 }
 
-function createInitialState(): RoomState {
+function createInitialState(): TicTacToe.RoomState {
   return {
-    board: Array(9).fill(null) as Cell[],
+    board: Array(9).fill(null) as TicTacToe.Cell[],
     currentTurn: 'X',
     phase: 'waiting',
     players: {},
@@ -40,21 +34,21 @@ function createInitialState(): RoomState {
 }
 
 export default class TicTacToeServer implements Party.Server {
-  private state: RoomState;
+  private state: TicTacToe.RoomState;
 
   constructor(readonly room: Party.Room) {
     this.state = createInitialState();
   }
 
-  private broadcast(message: ServerMessage): void {
+  private broadcast(message: TicTacToe.ServerMessage): void {
     this.room.broadcast(JSON.stringify(message));
   }
 
-  private sendTo(conn: Party.Connection, message: ServerMessage): void {
+  private sendTo(conn: Party.Connection, message: TicTacToe.ServerMessage): void {
     conn.send(JSON.stringify(message));
   }
 
-  private assignSymbol(): Player | null {
+  private assignSymbol(): TicTacToe.Player | null {
     const taken = Object.values(this.state.players).map((p) => p.symbol);
     if (!taken.includes('X')) return 'X';
     if (!taken.includes('O')) return 'O';
@@ -86,7 +80,7 @@ export default class TicTacToeServer implements Party.Server {
   }
 
   onMessage(message: string, sender: Party.Connection): void {
-    const parsed = JSON.parse(message) as ClientMessage;
+    const parsed = JSON.parse(message) as TicTacToe.ClientMessage;
     const playerInfo = this.state.players[sender.id];
 
     if (!playerInfo) return;

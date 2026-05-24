@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import type { Difficulty } from '@bake/shared/sudoku/sudoku-types';
+import type { Sudoku } from '@bake/shared';
 import { SudokuRoomService } from '../../../core/services/sudoku-room.service';
 import { RoomInfoComponent } from '../../../shared/components/room-info/room-info.component';
 import { SudokuGameStatusComponent } from '../game-status/game-status.component';
@@ -30,7 +30,7 @@ export class SudokuPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const difficulty: Difficulty = history.state?.difficulty ?? 'medium';
+    const difficulty: Sudoku.Difficulty = history.state?.difficulty ?? 'medium';
     this.gameService.joinRoom(this.roomId, playerName, difficulty);
   }
 

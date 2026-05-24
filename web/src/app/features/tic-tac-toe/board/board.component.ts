@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import type { Board, GamePhase } from '@bake/shared';
+import type { TicTacToe } from '@bake/shared';
 
 @Component({
   selector: 'app-board',
@@ -7,8 +7,8 @@ import type { Board, GamePhase } from '@bake/shared';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardComponent {
-  readonly board = input.required<Board>();
-  readonly phase = input.required<GamePhase>();
+  readonly board = input.required<TicTacToe.Board>();
+  readonly phase = input.required<TicTacToe.GamePhase>();
   readonly isMyTurn = input.required<boolean>();
   readonly cellClick = output<number>();
 }

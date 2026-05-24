@@ -1,13 +1,8 @@
 import { generateSudoku } from '@bake/shared/src/sudoku/sudoku-generator';
-import type {
-  ClientMessage,
-  Difficulty,
-  RoomState,
-  ServerMessage,
-} from '@bake/shared/src/sudoku/sudoku-types';
+import type { Sudoku } from '@bake/shared';
 import type * as Party from 'partykit/server';
 
-const CLUES_BY_DIFFICULTY: Record<Difficulty, number> = {
+const CLUES_BY_DIFFICULTY: Record<Sudoku.Difficulty, number> = {
   easy: 46,
   medium: 36,
   hard: 26,
@@ -46,7 +41,7 @@ function isBoardComplete(grid: number[][], puzzle: number[][]): boolean {
   return true;
 }
 
-function createInitialState(): RoomState {
+function createInitialState(): Sudoku.RoomState {
   return {
     puzzle: createEmptyGrid(),
     difficulty: 'medium',
@@ -57,20 +52,20 @@ function createInitialState(): RoomState {
 }
 
 export default class SudokuServer implements Party.Server {
-  private state: RoomState;
+  private state: Sudoku.RoomState;
   private solution: number[][] = [];
-  private difficulty: Difficulty = 'medium';
+  private difficulty: Sudoku.Difficulty = 'medium';
   private generated = false;
 
   constructor(readonly room: Party.Room) {
     this.state = createInitialState();
   }
 
-  private broadcast(message: ServerMessage): void {
+  private broadcast(message: Sudoku.ServerMessage): void {
     this.room.broadcast(JSON.stringify(message));
   }
 
-  private sendTo(conn: Party.Connection, message: ServerMessage): void {
+  private sendTo(conn: Party.Connection, message: Sudoku.ServerMessage): void {
     conn.send(JSON.stringify(message));
   }
 
@@ -112,7 +107,7 @@ export default class SudokuServer implements Party.Server {
   }
 
   onMessage(message: string, sender: Party.Connection): void {
-    const parsed = JSON.parse(message) as ClientMessage;
+    const parsed = JSON.parse(message) as Sudoku.ClientMessage;
     const player = this.state.players[sender.id];
 
     if (!player) return;

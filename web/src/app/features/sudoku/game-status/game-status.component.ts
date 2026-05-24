@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import type { GamePhase } from '@bake/shared/src/sudoku/sudoku-types';
+import type { Sudoku } from '@bake/shared';
 
 export interface PlayerDisplay {
   id: string;
@@ -17,6 +17,6 @@ export interface PlayerDisplay {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SudokuGameStatusComponent {
-  readonly phase = input.required<GamePhase>();
+  readonly phase = input.required<Sudoku.GamePhase>();
   readonly players = input.required<PlayerDisplay[]>();
 }

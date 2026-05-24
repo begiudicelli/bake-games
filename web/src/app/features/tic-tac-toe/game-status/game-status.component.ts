@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import type { GamePhase, Player, PlayerInfo } from '@bake/shared';
+import type { TicTacToe } from '@bake/shared';
 
 @Component({
   selector: 'app-game-status',
@@ -7,13 +7,13 @@ import type { GamePhase, Player, PlayerInfo } from '@bake/shared';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GameStatusComponent {
-  readonly phase = input.required<GamePhase>();
-  readonly winner = input.required<Player | 'draw' | null>();
-  readonly currentTurn = input.required<Player>();
+  readonly phase = input.required<TicTacToe.GamePhase>();
+  readonly winner = input.required<TicTacToe.Player | 'draw' | null>();
+  readonly currentTurn = input.required<TicTacToe.Player>();
   readonly isMyTurn = input.required<boolean>();
-  readonly playersInfo = input.required<PlayerInfo[]>();
+  readonly playersInfo = input.required<TicTacToe.PlayerInfo[]>();
 
-  getPlayerName(symbol: Player | 'draw' | null): string {
+  getPlayerName(symbol: TicTacToe.Player | 'draw' | null): string {
     if (!symbol || symbol === 'draw') {
       return '';
     }

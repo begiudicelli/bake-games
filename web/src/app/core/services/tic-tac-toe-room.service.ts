@@ -1,10 +1,10 @@
 import { Injectable, OnDestroy, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import type { ClientMessage, Player, PlayerInfo, RoomState, ServerMessage } from '@bake/shared';
+import type { TicTacToe} from '@bake/shared';
 import PartySocket from 'partysocket';
 import { environment } from '../../environments/environment';
 
-const initialState: RoomState = {
+const initialState: TicTacToe.RoomState = {
   board: Array(9).fill(null),
   currentTurn: 'X',
   phase: 'waiting',
@@ -17,7 +17,7 @@ export class TicTacToeRoomService implements OnDestroy {
   private readonly router = inject(Router);
   private socket: PartySocket | null = null;
 
-  private readonly _state = signal<RoomState>(initialState);
+  private readonly _state = signal<TicTacToe.RoomState>(initialState);
   private readonly _connectionId = signal<string | null>(null);
   private readonly _connected = signal(false);
   private readonly _error = signal<string | null>(null);
@@ -26,13 +26,13 @@ export class TicTacToeRoomService implements OnDestroy {
   readonly connected = this._connected.asReadonly();
   readonly error = this._error.asReadonly();
 
-  readonly myInfo = computed<PlayerInfo | null>(() => {
+  readonly myInfo = computed<TicTacToe.PlayerInfo | null>(() => {
     const id = this._connectionId();
     if (!id) return null;
     return this._state().players[id] ?? null;
   });
 
-  readonly mySymbol = computed<Player | null>(() => this.myInfo()?.symbol ?? null);
+  readonly mySymbol = computed<TicTacToe.Player | null>(() => this.myInfo()?.symbol ?? null);
 
   readonly isMyTurn = computed(() => {
     const symbol = this.mySymbol();
@@ -59,7 +59,7 @@ export class TicTacToeRoomService implements OnDestroy {
     });
 
     this.socket.addEventListener('message', (event: MessageEvent) => {
-      const message = JSON.parse(event.data) as ServerMessage;
+      const message = JSON.parse(event.data) as TicTacToe.ServerMessage;
       if (message.type === 'STATE_UPDATE') {
         this._state.set(message.state);
         this._error.set(null);
@@ -99,7 +99,7 @@ export class TicTacToeRoomService implements OnDestroy {
     this.leaveRoom();
   }
 
-  private send(message: ClientMessage): void {
+  private send(message: TicTacToe.ClientMessage): void {
     this.socket?.send(JSON.stringify(message));
   }
 }
