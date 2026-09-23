@@ -28,6 +28,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'yahtzee/:roomId',
+    loadComponent: () =>
+      import('./features/yahtzee/yahtzee-page/yahtzee-page.component').then(
+        (m) => m.YahtzeePageComponent,
+      ),
+  },
+  {
     path: '**',
     redirectTo: '',
   },
