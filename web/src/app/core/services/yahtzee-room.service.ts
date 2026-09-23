@@ -9,6 +9,7 @@ const initialState: Yahtzee.RoomState = {
   players: {},
   currentTurnId: null,
   winnerId: null,
+  leaderId: null,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -127,6 +128,10 @@ export class YahtzeeRoomService implements OnDestroy {
   selectCategory(category: Yahtzee.ScoreCategory): void {
     if (!this.canSelectCategory()) return;
     this.send({ type: 'SELECT_CATEGORY', category });
+  }
+
+  startGame(): void {
+    this.send({ type: 'START' });
   }
 
   restart(): void {
