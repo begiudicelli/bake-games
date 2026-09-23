@@ -32,6 +32,14 @@ export class HomeComponent {
       route: '/sudoku',
       hasDifficulty: true,
     },
+    {
+      id: 'yahtzee',
+      title: 'Yahtzee',
+      description: 'Role os dados e tente fazer as melhores combinações.',
+      players: 'Até 8 jogadores',
+      route: '/yahtzee',
+      hasDifficulty: false,
+    },
   ];
 
   onSelectGame(game: GameCard): void {
