@@ -1,0 +1,32 @@
+<div class="bg-gray-900 border border-gray-800 rounded-xl p-8">
+  <h2 class="text-2xl font-bold mb-6">Dados</h2>
+
+  <ng-container *ngIf="roomService.myState() as player">
+    <div class="grid grid-cols-5 gap-4 mb-8">
+      <button *ngFor="let dice of player.dice; let i = index"
+        (click)="toggleKeep(i)"
+        [disabled]="!roomService.isMyTurn()"
+        class="aspect-square flex items-center justify-center text-3xl font-bold rounded-lg transition-all duration-200"
+        [ngClass]="{
+          'bg-gray-700 text-white border-2 border-gray-600 hover:border-blue-500 hover:bg-gray-600': !dice.kept,
+          'bg-blue-600 text-white border-2 border-blue-400': dice.kept,
+          'opacity-50 cursor-not-allowed': !roomService.isMyTurn()
+        }">
+        {{ dice.value }}
+      </button>
+    </div>
+
+    <div class="flex flex-col items-start mb-4">
+      <button (click)="rollDice()"
+        [disabled]="!roomService.canRoll()"
+        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-semibold transition-colors">
+        Rolar Dados
+      </button>
+      <p class="text-sm text-gray-400 mt-2">
+        Rolagens restantes: {{ player.rollsLeft }}
+      </p>
+    </div>
+
+    <p *ngIf="!roomService.isMyTurn()" class="text-sm text-gray-400">Aguardando sua vez...</p>
+  </ng-container>
+</div>

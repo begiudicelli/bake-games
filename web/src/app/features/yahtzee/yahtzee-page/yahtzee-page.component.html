@@ -1,0 +1,49 @@
+<ng-container *ngIf="roomService.state().phase === 'waiting'">
+  <app-yahtzee-lobby 
+    [roomId]="roomId"
+    [playerName]="playerName"
+    (startGame)="onStartGame()"
+  />
+</ng-container>
+
+<ng-container *ngIf="roomService.state().phase !== 'waiting'">
+  <main class="min-h-screen bg-gray-950 text-white flex flex-col p-8">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-4xl font-bold">Yahtzee</h1>
+      <button (click)="goHome()" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
+        Voltar
+      </button>
+    </div>
+
+    <div *ngIf="roomService.error()" class="mb-4 p-4 bg-red-900 border border-red-600 rounded-lg">
+      {{ roomService.error() }}
+    </div>
+
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2">
+        <app-yahtzee-dice />
+        <app-yahtzee-game-status class="mt-8" />
+      </div>
+      <div>
+        <app-yahtzee-scoreboard />
+      </div>
+    </div>
+
+    <div class="mt-8 border-t border-gray-800 pt-4">
+      <h3 class="text-lg font-semibold mb-4">Jogadores</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div *ngFor="let player of roomService.playersInfo()" class="p-4 bg-gray-900 rounded-lg border"
+          [ngClass]="player.isCurrentTurn ? 'border-blue-500' : 'border-gray-800'">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="font-semibold">{{ player.name }}</p>
+              <p *ngIf="player.isMe" class="text-sm text-gray-400">(Você)</p>
+            </div>
+            <p class="text-2xl font-bold">{{ player.totalScore }}</p>
+          </div>
+          <p *ngIf="player.isCurrentTurn" class="text-xs text-blue-400 mt-2">🎲 Sua vez</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</ng-container>

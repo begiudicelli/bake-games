@@ -1,0 +1,75 @@
+<div class="min-h-screen bg-gray-950 text-white flex items-center justify-center p-8">
+  <div class="w-full max-w-md rounded-2xl bg-gray-900 border border-gray-800 p-8 space-y-6">
+    <!-- Header -->
+    <div class="text-center">
+      <h1 class="text-3xl font-bold mb-2">Yahtzee</h1>
+      <p class="text-gray-400">Sala: <span class="font-mono font-semibold text-blue-400">{{ roomId() }}</span></p>
+    </div>
+
+    <!-- Share Link -->
+    <div class="space-y-3">
+      <p class="text-sm text-gray-400">Convide seus amigos para entrar:</p>
+      <div class="flex gap-2">
+        <input
+          type="text"
+          [value]="gameUrl()"
+          readonly
+          class="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm font-mono text-gray-300"
+        />
+        <button
+          (click)="copyToClipboard()"
+          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-colors"
+          [class.bg-green-600]="copied()"
+          [class.hover:bg-green-700]="copied()"
+        >
+          {{ copied() ? '✓ Copiado!' : 'Copiar' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Connection Status -->
+    <div class="p-3 bg-gray-800 rounded-lg border border-gray-700">
+      <p class="text-sm text-gray-400">
+        <span *ngIf="!roomService.connected()" class="text-yellow-400">⏳ Conectando...</span>
+        <span *ngIf="roomService.connected()" class="text-green-400">✓ Conectado</span>
+      </p>
+    </div>
+
+    <!-- Players List -->
+    <div class="space-y-3">
+      <p class="text-sm text-gray-400">Jogadores na sala ({{ roomService.playersInfo().length }}):</p>
+      <div class="space-y-2">
+        <div *ngFor="let player of roomService.playersInfo()" class="p-3 bg-gray-800 rounded-lg border border-gray-700 flex justify-between items-center">
+          <div>
+            <p class="font-semibold">{{ player.name }}</p>
+            <p *ngIf="player.isMe" class="text-xs text-gray-500">(Você)</p>
+          </div>
+          <span *ngIf="player.id === roomService.playersInfo()[0]?.id" class="text-xs bg-blue-900 text-blue-200 px-2 py-1 rounded">
+            Líder
+          </span>
+        </div>
+      </div>
+      <p *ngIf="roomService.playersInfo().length < 2" class="text-xs text-gray-500 mt-2">
+        Aguarde mais jogadores para começar...
+      </p>
+    </div>
+
+    <!-- Start Button -->
+    <button
+      *ngIf="isRoomLeader()"
+      (click)="onStartGame()"
+      [disabled]="!canStartGame()"
+      class="w-full py-3 rounded-lg font-semibold transition-colors"
+      [ngClass]="{
+        'bg-green-600 hover:bg-green-700 text-white': canStartGame(),
+        'bg-gray-700 text-gray-500 cursor-not-allowed': !canStartGame()
+      }"
+    >
+      {{ canStartGame() ? 'Iniciar Jogo' : 'Aguarde mais jogadores...' }}
+    </button>
+
+    <p *ngIf="!isRoomLeader()" class="text-center text-sm text-gray-400">
+      Aguardando o líder iniciar o jogo...
+    </p>
+  </div>
+</div>
