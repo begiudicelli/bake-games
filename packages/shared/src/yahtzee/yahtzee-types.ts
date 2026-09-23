@@ -36,10 +36,12 @@ export interface RoomState {
   players: Record<string, PlayerState>;
   currentTurnId: string | null;
   winnerId: string | null;
+  leaderId: string | null;
 }
 
 export type ClientMessage =
   | { type: 'JOIN'; playerName: string }
+  | { type: 'START' }
   | { type: 'ROLL_DICE' }
   | { type: 'TOGGLE_KEEP'; index: number }
   | { type: 'SELECT_CATEGORY'; category: ScoreCategory }
