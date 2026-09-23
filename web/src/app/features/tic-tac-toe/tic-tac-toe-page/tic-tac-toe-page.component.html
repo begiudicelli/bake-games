@@ -1,62 +1,75 @@
-<main class="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-6">
-  <div class="w-full max-w-sm flex flex-col gap-6">
-    <div class="flex items-center justify-between">
-      <button
-        (click)="goHome()"
-        class="text-gray-400 hover:text-white text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-        aria-label="Voltar para a tela inicial"
-      >
-        ← Voltar
-      </button>
-      <h1 class="text-lg font-semibold">Tic-tac-toe</h1>
-      <div class="w-12"></div>
-    </div>
+<ng-container *ngIf="gameService.state().phase === 'waiting'">
+  <app-game-waiting-room
+    [roomService]="gameService"
+    [roomId]="roomId"
+    [gameName]="'Tic Tac Toe'"
+    [minPlayers]="2"
+    [maxPlayers]="2"
+    [initialPlayerName]="playerName()"
+  />
+</ng-container>
 
-    <app-room-info [roomId]="roomId" gameRoute="tic-tac-toe" />
+<ng-container *ngIf="gameService.state().phase !== 'waiting'">
+  <main class="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-6">
+    <div class="w-full max-w-sm flex flex-col gap-6">
+      <div class="flex items-center justify-between">
+        <button
+          (click)="goHome()"
+          class="text-gray-400 hover:text-white text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+          aria-label="Voltar para a tela inicial"
+        >
+          ← Voltar
+        </button>
+        <h1 class="text-lg font-semibold">Tic-tac-toe</h1>
+        <div class="w-12"></div>
+      </div>
 
-    <div class="flex justify-center gap-6">
-      @for (player of gameService.playersInfo(); track player.symbol) {
-        <div class="flex items-center gap-2">
-          <span
-            class="text-sm font-bold"
-            [class]="player.symbol === 'X' ? 'text-blue-400' : 'text-rose-400'"
-          >
-            {{ player.symbol }}
-          </span>
-          <span class="text-sm text-gray-300">{{ player.name }}</span>
-          @if (player.symbol === gameService.mySymbol()) {
-            <span class="text-xs text-gray-500">(você)</span>
-          }
-        </div>
+      <app-room-info [roomId]="roomId" gameRoute="tic-tac-toe" />
+
+      <div class="flex justify-center gap-6">
+        @for (player of gameService.playersInfo(); track player.symbol) {
+          <div class="flex items-center gap-2">
+            <span
+              class="text-sm font-bold"
+              [class]="player.symbol === 'X' ? 'text-blue-400' : 'text-rose-400'"
+            >
+              {{ player.symbol }}
+            </span>
+            <span class="text-sm text-gray-300">{{ player.name }}</span>
+            @if (player.symbol === gameService.mySymbol()) {
+              <span class="text-xs text-gray-500">(você)</span>
+            }
+          </div>
+        }
+      </div>
+
+      <app-game-status
+        [phase]="gameService.state().phase"
+        [winner]="gameService.state().winner"
+        [currentTurn]="gameService.state().currentTurn"
+        [isMyTurn]="gameService.isMyTurn()"
+        [playersInfo]="gameService.playersInfo()"
+      />
+
+      <app-board
+        [board]="gameService.state().board"
+        [phase]="gameService.state().phase"
+        [isMyTurn]="gameService.isMyTurn()"
+        (cellClick)="gameService.sendMove($event)"
+      />
+
+      @if (gameService.state().phase === 'finished') {
+        <button
+          (click)="gameService.sendRestart()"
+          class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          Jogar novamente
+        </button>
+      }
+
+      @if (gameService.error()) {
+        <p class="text-center text-rose-400 text-sm">{{ gameService.error() }}</p>
       }
     </div>
-
-    <app-game-status
-      [phase]="gameService.state().phase"
-      [winner]="gameService.state().winner"
-      [currentTurn]="gameService.state().currentTurn"
-      [isMyTurn]="gameService.isMyTurn()"
-      [playersInfo]="gameService.playersInfo()"
-    />
-
-    <app-board
-      [board]="gameService.state().board"
-      [phase]="gameService.state().phase"
-      [isMyTurn]="gameService.isMyTurn()"
-      (cellClick)="gameService.sendMove($event)"
-    />
-
-    @if (gameService.state().phase === 'finished') {
-      <button
-        (click)="gameService.sendRestart()"
-        class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
-        Jogar novamente
-      </button>
-    }
-
-    @if (gameService.error()) {
-      <p class="text-center text-rose-400 text-sm">{{ gameService.error() }}</p>
-    }
-  </div>
-</main>
+  </main>
+</ng-container>

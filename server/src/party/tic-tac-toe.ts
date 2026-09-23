@@ -87,12 +87,18 @@ export default class TicTacToeServer implements Party.Server {
 
     if (parsed.type === 'JOIN') {
       this.state.players[sender.id].name = parsed.playerName;
+      this.broadcast({ type: 'STATE_UPDATE', state: this.state });
+      return;
+    }
+
+    if (parsed.type === 'START') {
+      if (this.state.phase !== 'waiting') return;
       const bothConnected = Object.keys(this.state.players).length === 2;
       const bothNamed = Object.values(this.state.players).every((p) => p.name !== 'Jogador');
       if (bothConnected && bothNamed) {
         this.state.phase = 'playing';
+        this.broadcast({ type: 'STATE_UPDATE', state: this.state });
       }
-      this.broadcast({ type: 'STATE_UPDATE', state: this.state });
       return;
     }
 

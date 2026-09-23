@@ -1,0 +1,133 @@
+<div class="min-h-screen bg-gray-950 text-white flex items-center justify-center p-4">
+  <!-- Step 1: Join Form -->
+  <ng-container *ngIf="!isJoined()">
+    <div class="w-full max-w-md rounded-2xl bg-gray-900 p-6 space-y-6">
+      <div class="space-y-2">
+        <h1 class="text-2xl font-bold">Entrando em {{ roomId() }}</h1>
+        <p class="text-gray-400">Como você quer ser chamado(a) nessa partida?</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="join()" class="space-y-4">
+        <div class="space-y-2">
+          <input
+            type="text"
+            formControlName="playerName"
+            maxlength="20"
+            placeholder="Seu apelido"
+            class="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 outline-none focus:border-blue-500"
+            autofocus
+          />
+          <p class="text-sm text-gray-500">Máx. 20 caracteres.</p>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="form.invalid"
+          class="w-full rounded-lg bg-blue-600 py-3 font-medium hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
+        >
+          Entrar na partida
+        </button>
+      </form>
+    </div>
+  </ng-container>
+
+  <!-- Step 2: Waiting Room -->
+  <ng-container *ngIf="isJoined()">
+    <div class="w-full max-w-md rounded-2xl bg-gray-900 border border-gray-800 p-8 space-y-6">
+      <!-- Header with game name -->
+      <div class="text-center">
+        <h1 class="text-3xl font-bold mb-4 capitalize">{{ gameName() }}</h1>
+
+        <!-- Room Code Display -->
+        <div class="flex items-center justify-center gap-3 mb-6">
+          <span class="font-mono font-bold text-2xl text-blue-400 tracking-widest">{{ roomId() }}</span>
+          <button
+            (click)="copyToClipboard()"
+            class="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-colors text-sm"
+            [class.bg-green-600]="copied()"
+            [class.hover:bg-green-700]="copied()"
+            title="Copiar código da sala"
+          >
+            {{ copied() ? '✓' : '📋' }}
+          </button>
+        </div>
+
+        <!-- Invite Button -->
+        <button
+          (click)="copyInviteLink()"
+          class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors text-sm mb-4"
+          [class.bg-green-600]="copied()"
+          [class.hover:bg-green-700]="copied()"
+        >
+          {{ copied() ? '✓ Link copiado!' : '👥 Convide amigos' }}
+        </button>
+      </div>
+
+      <!-- Connection Status -->
+      <div class="p-3 bg-gray-800 rounded-lg border border-gray-700">
+        <p class="text-sm text-gray-400">
+          <span *ngIf="!connected()" class="text-yellow-400">⏳ Conectando...</span>
+          <span *ngIf="connected()" class="text-green-400">✓ Conectado</span>
+        </p>
+      </div>
+
+      <!-- Players List -->
+      <div class="space-y-3">
+        <p class="text-sm text-gray-400">
+          Jogadores na sala ({{ playersInfo().length }}/{{ maxPlayers() }})
+        </p>
+        <div class="space-y-2 max-h-48 overflow-y-auto">
+          <div
+            *ngFor="let player of playersInfo()"
+            class="p-3 bg-gray-800 rounded-lg border border-gray-700 flex justify-between items-center"
+          >
+            <div class="flex-1">
+              <p class="font-semibold">{{ player.name }}</p>
+              <p *ngIf="player.isMe" class="text-xs text-gray-500">(Você)</p>
+            </div>
+            <span
+              *ngIf="player.id === playersInfo()[0]?.id"
+              class="text-xs bg-blue-900 text-blue-200 px-2 py-1 rounded whitespace-nowrap ml-2"
+            >
+              👑 Líder
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Waiting/Ready Message -->
+      <div *ngIf="shouldShowStartMessage()" class="p-3 bg-blue-900 border border-blue-700 rounded-lg">
+        <p class="text-sm text-blue-200">
+          <ng-container *ngIf="!isRoomLeader()">
+            ⏳ Aguardando o líder iniciar o jogo...
+          </ng-container>
+          <ng-container *ngIf="isRoomLeader() && playersInfo().length < minPlayers()">
+            ⏳ Aguarde {{ minPlayers() - playersInfo().length }} jogador(es) para começar...
+          </ng-container>
+        </p>
+      </div>
+
+      <!-- Start Button (Leader only) -->
+      <button
+        *ngIf="isRoomLeader()"
+        (click)="onStartGame()"
+        [disabled]="!canStartGame()"
+        class="w-full py-3 rounded-lg font-semibold transition-colors"
+        [ngClass]="{
+          'bg-green-600 hover:bg-green-700 text-white': canStartGame(),
+          'bg-gray-700 text-gray-500 cursor-not-allowed': !canStartGame(),
+        }"
+      >
+        {{ canStartGame() ? '🎮 Iniciar Jogo' : '⏳ Aguardando jogadores...' }}
+      </button>
+
+      <!-- Cancel Button -->
+      <button
+        (click)="goHome()"
+        class="w-full py-2 rounded-lg font-semibold border border-gray-700 text-gray-400 hover:text-white hover:border-gray-600 transition-colors"
+      >
+        Voltar
+      </button>
+    </div>
+  </ng-container>
+</div>

@@ -105,6 +105,11 @@ export abstract class BaseRoomService<
   protected abstract onConnected(playerName: string): void;
 
   /**
+   * Start the game (optional, implemented by game services)
+   */
+  startGame?(): void;
+
+  /**
    * Leave the game room
    */
   leaveRoom(): void {

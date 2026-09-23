@@ -1,0 +1,23 @@
+/* Game Waiting Room Component Styles */
+
+:host {
+  display: block;
+}
+
+/* Optional: Add custom scrollbar for players list */
+.max-h-48::-webkit-scrollbar {
+  width: 6px;
+}
+
+.max-h-48::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.max-h-48::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 3px;
+
+  &:hover {
+    background: #5a6470;
+  }
+}

@@ -1,8 +1,11 @@
 <ng-container *ngIf="roomService.state().phase === 'waiting'">
-  <app-yahtzee-lobby 
+  <app-game-waiting-room
+    [roomService]="roomService"
     [roomId]="roomId"
-    [playerName]="playerName"
-    (startGame)="onStartGame()"
+    [gameName]="'Yahtzee'"
+    [minPlayers]="1"
+    [maxPlayers]="8"
+    [initialPlayerName]="playerName()"
   />
 </ng-container>
 

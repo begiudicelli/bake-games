@@ -82,6 +82,10 @@ export class TicTacToeRoomService implements OnDestroy {
     this.send({ type: 'MOVE', index });
   }
 
+  startGame(): void {
+    this.send({ type: 'START' });
+  }
+
   sendRestart(): void {
     this.send({ type: 'RESTART' });
   }

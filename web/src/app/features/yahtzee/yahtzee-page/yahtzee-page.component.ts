@@ -1,21 +1,21 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { YahtzeeRoomService } from '../../../core/services/yahtzee-room.service';
+import { GameWaitingRoomComponent } from '../../../shared/components/game-waiting-room/game-waiting-room.component';
 import { YahtzeeDiceComponent } from '../dice/dice.component';
 import { YahtzeeScoreboardComponent } from '../scoreboard/scoreboard.component';
 import { YahtzeeGameStatusComponent } from '../game-status/game-status.component';
-import { YahtzeeLobbyComponent } from '../lobby/lobby.component';
 
 @Component({
   selector: 'app-yahtzee-page',
   standalone: true,
   imports: [
     CommonModule,
+    GameWaitingRoomComponent,
     YahtzeeDiceComponent,
     YahtzeeScoreboardComponent,
     YahtzeeGameStatusComponent,
-    YahtzeeLobbyComponent,
   ],
   templateUrl: './yahtzee-page.component.html',
   styleUrl: './yahtzee-page.component.scss',
@@ -27,7 +27,8 @@ export class YahtzeePageComponent implements OnInit, OnDestroy {
   protected readonly roomService = inject(YahtzeeRoomService);
 
   protected roomId = '';
-  protected playerName = '';
+  private readonly _playerName = signal('');
+  readonly playerName = this._playerName.asReadonly();
 
   ngOnInit(): void {
     this.roomId = this.route.snapshot.paramMap.get('roomId') || '';
@@ -37,24 +38,14 @@ export class YahtzeePageComponent implements OnInit, OnDestroy {
     }
 
     const playerName = history.state?.playerName;
-
-    if (!playerName) {
-      this.router.navigate(['/join/yahtzee', this.roomId]);
-      return;
+    if (playerName) {
+      this._playerName.set(playerName);
+      sessionStorage.setItem('playerName', playerName);
     }
-
-    this.playerName = playerName;
-    sessionStorage.setItem('playerName', this.playerName);
-    
-    this.roomService.joinRoom(this.roomId, this.playerName);
   }
 
   ngOnDestroy(): void {
     this.roomService.leaveRoom();
-  }
-
-  onStartGame(): void {
-    // O jogo é iniciado automaticamente quando o servidor muda a fase para 'playing'
   }
 
   goHome(): void {

@@ -97,6 +97,10 @@ export class SudokuRoomService implements OnDestroy {
     this.send({ type: 'ERASE', row, col });
   }
 
+  startGame(): void {
+    this.send({ type: 'START' });
+  }
+
   submit(): void {
     this.send({ type: 'SUBMIT' });
   }

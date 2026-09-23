@@ -20,6 +20,7 @@ export interface RoomState {
 
 export type ClientMessage =
   | { type: 'JOIN'; playerName: string; difficulty: Difficulty }
+  | { type: 'START' }
   | { type: 'PLACE_NUMBER'; row: number; col: number; value: number }
   | { type: 'ERASE'; row: number; col: number }
   | { type: 'SUBMIT' };

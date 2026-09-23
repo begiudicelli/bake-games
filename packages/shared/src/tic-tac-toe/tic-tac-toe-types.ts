@@ -19,6 +19,7 @@ export interface RoomState {
 
 export type ClientMessage =
   | { type: 'JOIN'; playerName: string }
+  | { type: 'START' }
   | { type: 'MOVE'; index: number }
   | { type: 'RESTART' };
 

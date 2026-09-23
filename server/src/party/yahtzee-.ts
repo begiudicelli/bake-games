@@ -233,9 +233,9 @@ export default class YahtzeeServer implements Party.Server {
         return;
       }
 
-      // Need at least 2 players
-      if (Object.keys(this.state.players).length < 2) {
-        this.sendTo(sender, { type: 'ERROR', message: 'Mínimo 2 jogadores necessários.' });
+      // Need at least 1 player
+      if (Object.keys(this.state.players).length < 1) {
+        this.sendTo(sender, { type: 'ERROR', message: 'Mínimo 1 jogador necessário.' });
         return;
       }
 

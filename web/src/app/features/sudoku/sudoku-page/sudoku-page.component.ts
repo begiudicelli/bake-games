@@ -1,14 +1,23 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import type { Sudoku } from '@bake/shared';
 import { SudokuRoomService } from '../../../core/services/sudoku-room.service';
+import { GameWaitingRoomComponent } from '../../../shared/components/game-waiting-room/game-waiting-room.component';
 import { RoomInfoComponent } from '../../../shared/components/room-info/room-info.component';
 import { SudokuGameStatusComponent } from '../game-status/game-status.component';
 import { SudokuBoardComponent } from '../sudoku-board/sudoku-board.component';
 
 @Component({
   selector: 'app-sudoku-page',
-  imports: [SudokuBoardComponent, SudokuGameStatusComponent, RoomInfoComponent],
+  standalone: true,
+  imports: [
+    CommonModule,
+    GameWaitingRoomComponent,
+    SudokuBoardComponent,
+    SudokuGameStatusComponent,
+    RoomInfoComponent,
+  ],
   templateUrl: './sudoku-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -20,18 +29,19 @@ export class SudokuPageComponent implements OnInit, OnDestroy {
   readonly emptyGrid: number[][] = Array.from({ length: 9 }, () => Array(9).fill(0) as number[]);
 
   roomId = '';
+  private readonly _playerName = signal('');
+  readonly playerName = this._playerName.asReadonly();
 
   ngOnInit(): void {
     this.roomId = this.route.snapshot.paramMap.get('roomId') ?? '';
     const playerName = history.state?.playerName;
-
-    if (!playerName) {
-      this.router.navigate(['/join/sudoku', this.roomId]);
-      return;
-    }
-
     const difficulty: Sudoku.Difficulty = history.state?.difficulty ?? 'medium';
-    this.gameService.joinRoom(this.roomId, playerName, difficulty);
+
+    if (playerName) {
+      this._playerName.set(playerName);
+      sessionStorage.setItem('playerName', playerName);
+      sessionStorage.setItem('sudokuDifficulty', difficulty);
+    }
   }
 
   totalEmpty(): number {

@@ -116,10 +116,17 @@ export default class SudokuServer implements Party.Server {
       player.name = parsed.playerName;
       this.difficulty = parsed.difficulty;
 
-      const allNamed = Object.values(this.state.players).every((p) => p.name !== 'Jogador');
-      const bothConnected = Object.keys(this.state.players).length === 2;
+      this.broadcast({ type: 'STATE_UPDATE', state: this.state });
+      return;
+    }
 
-      if (bothConnected && allNamed && !this.generated) {
+    if (parsed.type === 'START') {
+      if (this.state.phase !== 'waiting') return;
+
+      const allNamed = Object.values(this.state.players).every((p) => p.name !== 'Jogador');
+      const playerCount = Object.keys(this.state.players).length;
+
+      if (playerCount >= 1 && allNamed && !this.generated) {
         const clues = CLUES_BY_DIFFICULTY[this.difficulty];
         const { puzzle, solution } = generateSudoku(clues);
         this.solution = solution;
@@ -135,9 +142,9 @@ export default class SudokuServer implements Party.Server {
           p.hasErrors = false;
           p.winner = false;
         }
-      }
 
-      this.broadcast({ type: 'STATE_UPDATE', state: this.state });
+        this.broadcast({ type: 'STATE_UPDATE', state: this.state });
+      }
       return;
     }
 
