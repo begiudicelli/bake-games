@@ -7,6 +7,7 @@ function createInitialState(): Yahtzee.RoomState {
     phase: 'waiting',
     currentTurnId: null,
     winnerId: null,
+    leaderId: null,
   };
 }
 
@@ -182,6 +183,12 @@ export default class YahtzeeServer implements Party.Server {
     }
 
     this.state.players[conn.id] = createInitialPlayerState('Jogador');
+    
+    // Set as leader if this is the first player
+    if (this.state.leaderId === null) {
+      this.state.leaderId = conn.id;
+    }
+    
     this.sendTo(conn, { type: 'STATE_UPDATE', state: this.state });
     console.log(`[yahtzee] jogador conectado (sala: ${this.room.id})`);
   }
@@ -212,11 +219,34 @@ export default class YahtzeeServer implements Party.Server {
       const allNamed = Object.values(this.state.players).every((p) => p.name !== 'Jogador');
       const hasPlayers = Object.keys(this.state.players).length >= 2;
 
-      if (hasPlayers && allNamed && this.state.phase === 'waiting') {
-        this.state.phase = 'playing';
-        advanceTurn(this.state);
+      // Auto-start only if 2 players and all named (backward compatibility)
+      // But don't start - wait for explicit START message
+      
+      this.broadcast({ type: 'STATE_UPDATE', state: this.state });
+      return;
+    }
+
+    if (parsed.type === 'START') {
+      // Only leader can start the game
+      if (sender.id !== this.state.leaderId) {
+        this.sendTo(sender, { type: 'ERROR', message: 'Apenas o líder pode iniciar o jogo.' });
+        return;
       }
 
+      // Need at least 2 players
+      if (Object.keys(this.state.players).length < 2) {
+        this.sendTo(sender, { type: 'ERROR', message: 'Mínimo 2 jogadores necessários.' });
+        return;
+      }
+
+      // Can only start from waiting phase
+      if (this.state.phase !== 'waiting') {
+        this.sendTo(sender, { type: 'ERROR', message: 'Jogo já foi iniciado.' });
+        return;
+      }
+
+      this.state.phase = 'playing';
+      advanceTurn(this.state);
       this.broadcast({ type: 'STATE_UPDATE', state: this.state });
       return;
     }
