@@ -4,6 +4,7 @@
   "compatibilityDate": "2026-05-20",
   "parties": {
     "tictactoe": "src/party/tic-tac-toe.ts",
-    "sudoku": "src/party/sudoku.ts"
+    "sudoku": "src/party/sudoku.ts",
+    "yahtzee": "src/party/yahtzee-.ts"
   }
 }
