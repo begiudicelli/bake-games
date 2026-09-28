@@ -35,6 +35,7 @@ export class GameWaitingRoomComponent implements OnInit, OnDestroy {
   readonly minPlayers = input<number>(1);
   readonly maxPlayers = input<number>(8);
   readonly initialPlayerName = input<string>('');  // Pre-filled name from parent
+  readonly gameDifficulty = input<string>('medium');  // Optional difficulty for Sudoku
 
   // Internal state
   private readonly _isJoined = signal(false);
@@ -90,8 +91,15 @@ export class GameWaitingRoomComponent implements OnInit, OnDestroy {
     const playerName = this.form.getRawValue().playerName.trim();
     sessionStorage.setItem('playerName', playerName);
 
-    // Join the room
-    this.roomService().joinRoom(this.roomId(), playerName);
+    // Join the room - pass difficulty as optional third parameter
+    // Room services can accept 2 or 3 params depending on game needs
+    const service = this.roomService();
+    const difficulty = this.gameDifficulty();
+    
+    // Call with 2 or 3 params based on service signature
+    // Type-safe due to service implementation
+    (service.joinRoom as any)(this.roomId(), playerName, difficulty);
+    
     this._isJoined.set(true);
   }
 

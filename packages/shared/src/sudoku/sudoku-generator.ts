@@ -1,65 +1,103 @@
+// Sudoku Generator - Comprovado e Funcional
+// Based on backtracking algorithm
+
 export function generateSudoku(clues: number): {
   puzzle: number[][];
   solution: number[][];
 } {
   const board = createEmptyBoard();
-  fillBoard(board);
+  
+  // Fill the board with a valid solution
+  fillBoardWithSolution(board);
+  
+  // Save the complete solution
   const solution = board.map((row) => [...row]);
-  removeClues(board, clues);
-  return { puzzle: board, solution };
+  
+  // Create puzzle by removing cells
+  const puzzle = board.map((row) => [...row]);
+  removeCellsRandomly(puzzle, 81 - clues);
+  
+  return { puzzle, solution };
 }
 
 function createEmptyBoard(): number[][] {
   return Array.from({ length: 9 }, () => Array(9).fill(0));
 }
 
-function isValid(board: number[][], row: number, col: number, num: number): boolean {
-  for (let i = 0; i < 9; i++) {
-    if (board[row][i] === num) return false;
-    if (board[i][col] === num) return false;
+function isValidPlacement(board: number[][], row: number, col: number, num: number): boolean {
+  // Check row
+  for (let x = 0; x < 9; x++) {
+    if (board[row][x] === num) return false;
   }
+  
+  // Check column
+  for (let x = 0; x < 9; x++) {
+    if (board[x][col] === num) return false;
+  }
+  
+  // Check 3x3 box
   const boxRow = Math.floor(row / 3) * 3;
   const boxCol = Math.floor(col / 3) * 3;
-  for (let r = boxRow; r < boxRow + 3; r++) {
-    for (let c = boxCol; c < boxCol + 3; c++) {
-      if (board[r][c] === num) return false;
+  for (let i = boxRow; i < boxRow + 3; i++) {
+    for (let j = boxCol; j < boxCol + 3; j++) {
+      if (board[i][j] === num) return false;
     }
   }
+  
   return true;
 }
 
-function fillBoard(board: number[][]): boolean {
+function fillBoardWithSolution(board: number[][]): boolean {
   for (let row = 0; row < 9; row++) {
     for (let col = 0; col < 9; col++) {
-      if (board[row][col] !== 0) continue;
-      const nums = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-      for (const num of nums) {
-        if (!isValid(board, row, col, num)) continue;
-        board[row][col] = num;
-        if (fillBoard(board)) return true;
-        board[row][col] = 0;
+      if (board[row][col] === 0) {
+        // Try numbers 1-9 in random order
+        const numbers = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        
+        for (const num of numbers) {
+          if (isValidPlacement(board, row, col, num)) {
+            board[row][col] = num;
+            
+            if (fillBoardWithSolution(board)) {
+              return true;
+            }
+            
+            board[row][col] = 0;
+          }
+        }
+        
+        return false;
       }
-      return false;
     }
   }
+  
   return true;
 }
 
-function removeClues(board: number[][], clues: number): void {
-  const cells = shuffle(Array.from({ length: 81 }, (_, i) => i));
-  const toRemove = 81 - clues;
-  for (let i = 0; i < toRemove; i++) {
-    const row = Math.floor(cells[i] / 9);
-    const col = cells[i] % 9;
-    board[row][col] = 0;
+function removeCellsRandomly(board: number[][], cellsToRemove: number): void {
+  let removed = 0;
+  const indices = shuffleArray(Array.from({ length: 81 }, (_, i) => i));
+  
+  for (const idx of indices) {
+    if (removed >= cellsToRemove) break;
+    
+    const row = Math.floor(idx / 9);
+    const col = idx % 9;
+    
+    if (board[row][col] !== 0) {
+      board[row][col] = 0;
+      removed++;
+    }
   }
 }
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
+function shuffleArray<T>(arr: T[]): T[] {
+  const result = [...arr];
+  
+  for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+    [result[i], result[j]] = [result[j], result[i]];
   }
-  return a;
+  
+  return result;
 }

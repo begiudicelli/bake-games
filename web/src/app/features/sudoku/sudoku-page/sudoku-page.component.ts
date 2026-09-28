@@ -30,7 +30,10 @@ export class SudokuPageComponent implements OnInit, OnDestroy {
 
   roomId = '';
   private readonly _playerName = signal('');
+  private readonly _difficulty = signal<Sudoku.Difficulty>('medium');
+  
   readonly playerName = this._playerName.asReadonly();
+  readonly difficulty = this._difficulty.asReadonly();
 
   ngOnInit(): void {
     this.roomId = this.route.snapshot.paramMap.get('roomId') ?? '';
@@ -39,6 +42,7 @@ export class SudokuPageComponent implements OnInit, OnDestroy {
 
     if (playerName) {
       this._playerName.set(playerName);
+      this._difficulty.set(difficulty);
       sessionStorage.setItem('playerName', playerName);
       sessionStorage.setItem('sudokuDifficulty', difficulty);
     }
