@@ -1,14 +1,15 @@
+import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   OnDestroy,
   OnInit,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -68,6 +69,20 @@ export class GameWaitingRoomComponent implements OnInit, OnDestroy {
     return !this.isRoomLeader() || players < this.minPlayers();
   });
 
+  constructor() {
+    // Rejoin if difficulty changes after initial join (for Sudoku)
+    effect(() => {
+      if (this._isJoined() && this.gameDifficulty()) {
+        // If we're already joined and difficulty changes, rejoin with new difficulty
+        // This handles the case where parent updates gameDifficulty after initial render
+        const playerName = this.form.getRawValue().playerName;
+        const difficulty = this.gameDifficulty();
+        const service = this.roomService();
+        (service.joinRoom as any)(this.roomId(), playerName, difficulty);
+      }
+    });
+  }
+
   ngOnInit(): void {
     // Check if player name was provided (from game entry)
     const initialName = this.initialPlayerName();
@@ -91,13 +106,14 @@ export class GameWaitingRoomComponent implements OnInit, OnDestroy {
     const playerName = this.form.getRawValue().playerName.trim();
     sessionStorage.setItem('playerName', playerName);
 
-    // Join the room - pass difficulty as optional third parameter
-    // Room services can accept 2 or 3 params depending on game needs
-    const service = this.roomService();
+    // For Sudoku, ensure difficulty is set before joining
     const difficulty = this.gameDifficulty();
+    sessionStorage.setItem('gameDifficulty', difficulty);
+
+    // Join the room - pass difficulty as optional third parameter
+    const service = this.roomService();
     
     // Call with 2 or 3 params based on service signature
-    // Type-safe due to service implementation
     (service.joinRoom as any)(this.roomId(), playerName, difficulty);
     
     this._isJoined.set(true);

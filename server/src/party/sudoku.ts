@@ -114,7 +114,11 @@ export default class SudokuServer implements Party.Server {
 
     if (parsed.type === 'JOIN') {
       player.name = parsed.playerName;
-      this.difficulty = parsed.difficulty;
+      // Use provided difficulty or fallback to current/default
+      if (parsed.difficulty) {
+        this.difficulty = parsed.difficulty as Sudoku.Difficulty;
+      }
+      console.log(`[sudoku JOIN] Player: ${player.name}, Difficulty: ${this.difficulty}`);
 
       this.broadcast({ type: 'STATE_UPDATE', state: this.state });
       return;
@@ -128,6 +132,8 @@ export default class SudokuServer implements Party.Server {
 
       if (playerCount >= 1 && allNamed && !this.generated) {
         const clues = CLUES_BY_DIFFICULTY[this.difficulty];
+        console.log(`[sudoku START] Generating puzzle with difficulty=${this.difficulty}, clues=${clues}`);
+        
         const { puzzle, solution } = generateSudoku(clues);
         this.solution = solution;
         this.state.puzzle = puzzle;
